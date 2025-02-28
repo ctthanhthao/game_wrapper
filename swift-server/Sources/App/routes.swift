@@ -1,7 +1,11 @@
 import Vapor
 import Foundation
 
-var isGameAllowed = false
+actor GameState {
+    var isGameAllowed = false
+}
+
+let gameState = GameState()
 
 func sendSMS(_ message: String) async {
     let accountSID = Environment.get("TWILIO_ACCOUNT_SID") ?? ""
@@ -42,17 +46,17 @@ func routes(_ app: Application) throws {
     }
 
     app.get("allow") { req async -> String in
-        isGameAllowed = true
+        await gameState.isGameAllowed = true
         return "Game Allowed"
     }
 
     app.get("deny") { req async -> String in
-        isGameAllowed = false
+        await gameState.isGameAllowed = false
         return "Game Denied"
     }
 
     app.get("status") { req async -> String in
-        return isGameAllowed ? "allowed" : "denied"
+        return await gameState.isGameAllowed ? "allowed" : "denied"
     }
 
     // Send SMS when the game is detected
