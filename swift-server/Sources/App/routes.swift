@@ -1,5 +1,6 @@
 import Vapor
 import Foundation
+import FoundationNetworking
 
 actor GameState {
     private var isGameAllowed = false
@@ -28,7 +29,8 @@ func sendSMS(_ message: String) async {
     request.httpBody = "To=\(toNumber)&From=\(fromNumber)&Body=\(message)".data(using: .utf8)
 
     do {
-        let (_, response) = try await URLSession.shared.data(for: request)
+        let session = URLSession(configuration: .default)  // Create a URLSession instance
+		let (_, response) = try await session.data(for: request)
         if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 201 {
             print("SMS sent successfully")
         } else {
