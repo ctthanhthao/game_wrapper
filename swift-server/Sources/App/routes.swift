@@ -2,7 +2,15 @@ import Vapor
 import Foundation
 
 actor GameState {
-    var isGameAllowed = false
+    private var isGameAllowed = false
+
+    func setGameAllowed(_ allowed: Bool) {
+        isGameAllowed = allowed
+    }
+
+    func getGameAllowed() -> Bool {
+        return isGameAllowed
+    }
 }
 
 let gameState = GameState()
@@ -46,17 +54,18 @@ func routes(_ app: Application) throws {
     }
 
     app.get("allow") { req async -> String in
-        await gameState.isGameAllowed = true
+        await gameState.setGameAllowed(true)
         return "Game Allowed"
     }
 
     app.get("deny") { req async -> String in
-        await gameState.isGameAllowed = false
+        await gameState.setGameAllowed(false)
         return "Game Denied"
     }
 
     app.get("status") { req async -> String in
-        return await gameState.isGameAllowed ? "allowed" : "denied"
+        let status = await gameState.getGameAllowed()
+        return status ? "allowed" : "denied"
     }
 
     // Send SMS when the game is detected
